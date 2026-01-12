@@ -63,6 +63,9 @@ async function loadRooms() {
         if (currentFilters.capacity) params.append('capacity', currentFilters.capacity);
         if (currentFilters.status) params.append('status', currentFilters.status);
 
+        // Add cache buster
+        params.append('_t', Date.now());
+
         const response = await fetch(`${API_BASE}/classrooms?${params}`);
         const data = await response.json();
 

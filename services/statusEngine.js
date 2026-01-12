@@ -63,7 +63,7 @@ function getTodayDate() {
  * Priority: Override > Reservation > Timetable > Available
  */
 function getRoomStatus(roomId, slotId = null, day = null, date = null) {
-    const currentSlot = slotId !== null ? parseInt(slotId) : (getCurrentTimeSlot()?.id || null);
+    const currentSlot = (slotId !== null && slotId !== undefined) ? parseInt(slotId) : (getCurrentTimeSlot()?.id || null);
     const currentDay = day || getTodayName();
     const currentDate = date || getTodayDate();
 
