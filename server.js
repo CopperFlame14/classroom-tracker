@@ -23,6 +23,7 @@ if (!fs.existsSync(qrDir)) {
 app.use('/api/classrooms', require('./routes/classrooms'));
 app.use('/api/reservations', require('./routes/reservations'));
 app.use('/api/timeslots', require('./routes/timetable'));
+app.use('/api/auth', require('./routes/auth'));
 
 // Helper to get base URL dynamically
 function getBaseUrl(req) {
@@ -91,6 +92,10 @@ app.get('/admin', (req, res) => {
 
 app.get('/room', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'room.html'));
+});
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
 // Initialize database and start server

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - ClassTrack</title>
+    <meta name="description" content="Admin login for ClassTrack classroom management system.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-lg);
+        }
+
+        .login-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-2xl);
+            padding: var(--spacing-2xl);
+            width: 100%;
+            max-width: 420px;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto var(--spacing-lg);
+            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        }
+
+        .login-header h1 {
+            font-size: 1.75rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .login-header p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .login-form .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .login-form .form-input {
+            padding: var(--spacing-md);
+            font-size: 1rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: var(--spacing-md);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: var(--spacing-md);
+        }
+
+        .login-error {
+            background: var(--status-occupied-bg);
+            color: var(--status-occupied);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+            text-align: center;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        .login-error.show {
+            display: block;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: var(--spacing-lg);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: var(--spacing-md);
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.25rem;
+            pointer-events: none;
+        }
+
+        .input-icon-wrapper .form-input {
+            padding-left: 3rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">🏫</div>
+                <h1>Admin Login</h1>
+                <p>Sign in to manage classroom reservations</p>
+            </div>
+
+            <div class="login-error" id="loginError">
+                Invalid username or password
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <div class="input-icon-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" class="form-input" id="username" placeholder="Enter your username" required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-icon-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" class="form-input" id="password" placeholder="Enter your password" required autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary login-btn" id="loginBtn">
+                    Sign In
+                </button>
+            </form>
+
+            <a href="/" class="back-link">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <script src="/js/login.js"></script>
+</body>
+
+</html>
