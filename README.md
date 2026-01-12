@@ -1,3 +1,8 @@
+#for admin login:
+#username: admin
+#pswd: admin123
+
+
 # 🏫 Classroom Availability Tracker
 
 > A real-time, intelligent classroom management system built for smart campuses.
