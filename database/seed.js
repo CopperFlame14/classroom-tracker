@@ -20,7 +20,8 @@ async function seed() {
         { id: 5, start: '13:00', end: '14:00', label: 'Period 5' },
         { id: 6, start: '14:00', end: '15:00', label: 'Period 6' },
         { id: 7, start: '15:15', end: '16:15', label: 'Period 7' },
-        { id: 8, start: '16:15', end: '17:15', label: 'Period 8' }
+        { id: 8, start: '16:15', end: '17:15', label: 'Period 8' },
+        { id: 9, start: '17:15', end: '19:30', label: 'Period 9 (Evening)' }
     ];
 
     const insertSlot = prepare('INSERT INTO time_slots (id, start_time, end_time, label) VALUES (?, ?, ?, ?)');
@@ -78,7 +79,7 @@ async function seed() {
             for (let i = 0; i < numClasses; i++) {
                 let slotId;
                 do {
-                    slotId = Math.floor(Math.random() * 8) + 1;
+                    slotId = Math.floor(Math.random() * 9) + 1;
                 } while (usedSlots.has(slotId));
                 usedSlots.add(slotId);
 
@@ -104,7 +105,9 @@ async function seed() {
     const sampleReservations = [
         { room: 'A101', slot: 6, purpose: 'Faculty Meeting', by: 'Admin Office' },
         { room: 'B202', slot: 7, purpose: 'Workshop', by: 'Prof. Johnson' },
-        { room: 'C101', slot: 5, purpose: 'Guest Lecture', by: 'HOD Office' }
+        { room: 'C101', slot: 5, purpose: 'Guest Lecture', by: 'HOD Office' },
+        { room: 'D001', slot: 9, purpose: 'Evening Lab', by: 'Dr. Smith' },
+        { room: 'A201', slot: 9, purpose: 'Study Group', by: 'Students Union' }
     ];
 
     sampleReservations.forEach(res => {
