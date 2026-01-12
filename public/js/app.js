@@ -4,18 +4,35 @@
 
 const API_BASE = '/api';
 let rooms = [];
+//     block: '',
+//     floor: '',
+//     capacity: '',
+//     status: '',
+//     date: ''  // Add date to filters
+// };
+
 let currentFilters = {
     search: '',
     block: '',
     floor: '',
     capacity: '',
-    status: ''
+    status: '',
+    date: ''
 };
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     updateClock();
     setInterval(updateClock, 1000);
+
+    // Set default date to today
+    const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD local
+    const dateInput = document.getElementById('filterDate');
+    if (dateInput) {
+        dateInput.value = today;
+        currentFilters.date = today;
+    }
+
     loadRooms();
     setupFilters();
 
@@ -62,6 +79,7 @@ async function loadRooms() {
         if (currentFilters.floor !== '') params.append('floor', currentFilters.floor);
         if (currentFilters.capacity) params.append('capacity', currentFilters.capacity);
         if (currentFilters.status) params.append('status', currentFilters.status);
+        if (currentFilters.date) params.append('date', currentFilters.date);
 
         // Add cache buster
         params.append('_t', Date.now());
@@ -172,6 +190,12 @@ function setupFilters() {
             currentFilters[filterName] = e.target.value;
             loadRooms();
         });
+    });
+
+    // Date filter
+    document.getElementById('filterDate').addEventListener('change', (e) => {
+        currentFilters.date = e.target.value;
+        loadRooms();
     });
 }
 
