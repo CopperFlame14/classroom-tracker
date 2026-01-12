@@ -14,41 +14,45 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: var(--spacing-lg);
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
         }
 
         .login-card {
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius-2xl);
-            padding: var(--spacing-2xl);
+            background: var(--bg-surface);
+            background-image: var(--bg-gloss);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
             width: 100%;
-            max-width: 420px;
-            box-shadow: var(--shadow-xl);
+            max-width: 400px;
+            box-shadow: var(--shadow-gloss);
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: var(--spacing-xl);
+            margin-bottom: 2rem;
         }
 
         .login-logo {
-            width: 80px;
-            height: 80px;
-            background: var(--gradient-primary);
-            border-radius: var(--radius-xl);
+            width: 60px;
+            height: 60px;
+            background: #000;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
-            margin: 0 auto var(--spacing-lg);
-            box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: var(--gleam);
         }
 
         .login-header h1 {
-            font-size: 1.75rem;
-            margin-bottom: var(--spacing-xs);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
         }
 
         .login-header p {
@@ -57,30 +61,27 @@
         }
 
         .login-form .form-group {
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .login-form .form-input {
-            padding: var(--spacing-md);
-            font-size: 1rem;
+            margin-bottom: 1.25rem;
         }
 
         .login-btn {
             width: 100%;
-            padding: var(--spacing-md);
-            font-size: 1rem;
-            font-weight: 600;
-            margin-top: var(--spacing-md);
+            padding: 0.75rem;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
         .login-error {
-            background: var(--status-occupied-bg);
-            color: var(--status-occupied);
-            padding: var(--spacing-md);
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            padding: 0.75rem;
             border-radius: var(--radius-md);
-            margin-bottom: var(--spacing-lg);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            margin-bottom: 1.5rem;
             text-align: center;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
             display: none;
         }
 
@@ -90,21 +91,39 @@
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-5px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(5px);
+            }
+        }
+
+        .auth-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
         .back-link {
-            display: block;
             text-align: center;
-            margin-top: var(--spacing-lg);
-            color: var(--text-secondary);
-            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            transition: color 0.2s;
         }
 
         .back-link:hover {
-            color: var(--text-primary);
+            color: #fff;
         }
 
         .input-icon-wrapper {
@@ -113,15 +132,17 @@
 
         .input-icon {
             position: absolute;
-            left: var(--spacing-md);
+            left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 1.25rem;
+            font-size: 1rem;
             pointer-events: none;
+            opacity: 0.5;
         }
 
         .input-icon-wrapper .form-input {
-            padding-left: 3rem;
+            padding-left: 2.5rem;
+            width: 100%;
         }
     </style>
 </head>
@@ -144,7 +165,8 @@
                     <label class="form-label">Username</label>
                     <div class="input-icon-wrapper">
                         <span class="input-icon">👤</span>
-                        <input type="text" class="form-input" id="username" placeholder="Enter your username" required autocomplete="username">
+                        <input type="text" class="form-input" id="username" placeholder="Enter your username" required
+                            autocomplete="username">
                     </div>
                 </div>
 
@@ -152,7 +174,8 @@
                     <label class="form-label">Password</label>
                     <div class="input-icon-wrapper">
                         <span class="input-icon">🔒</span>
-                        <input type="password" class="form-input" id="password" placeholder="Enter your password" required autocomplete="current-password">
+                        <input type="password" class="form-input" id="password" placeholder="Enter your password"
+                            required autocomplete="current-password">
                     </div>
                 </div>
 
