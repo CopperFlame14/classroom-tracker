@@ -13,11 +13,21 @@ async function ensureDB() {
 }
 
 /**
+ * Helper to get date object in school's timezone (Asia/Kolkata)
+ */
+function getSchoolTime() {
+    return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+}
+
+/**
  * Get the current time slot based on current time
  */
 function getCurrentTimeSlot() {
-    const now = new Date();
-    const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
+    const now = getSchoolTime();
+    // Get HH:MM in 24-hour format
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const currentTime = `${hours}:${minutes}`;
 
     const slots = prepare('SELECT * FROM time_slots ORDER BY id').all();
     for (const slot of slots) {
@@ -34,14 +44,18 @@ function getCurrentTimeSlot() {
  */
 function getTodayName() {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    return days[new Date().getDay()];
+    return days[getSchoolTime().getDay()];
 }
 
 /**
  * Get today's date in YYYY-MM-DD format
  */
 function getTodayDate() {
-    return new Date().toISOString().split('T')[0];
+    const now = getSchoolTime();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 /**

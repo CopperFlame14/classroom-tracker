@@ -1,6 +1,6 @@
 {
   "name": "classroom-tracker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Real-time classroom availability tracker for college campuses",
   "main": "server.js",
   "scripts": {
