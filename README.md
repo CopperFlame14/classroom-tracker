@@ -2,7 +2,13 @@
 
 
 > A real-time, intelligent classroom management system built for smart campuses.
+## 🔑 Demo Credentials
 
+To access the Admin Panel during the demo:
+
+- **Login URL**: `http://localhost:3000/admin`
+- **Username**: `admin`
+- **Password**: `admin123`
 ![Dashboard Preview](public/images/dashboard-preview.png)
 
 ## 🚀 Key Features
@@ -23,13 +29,7 @@
 - **Database**: SQLite with `sql.js` for fast, server-side data management.
 - **QR Code System**: Generate unique QR codes for physical room signage.
 
-## 🔑 Demo Credentials
 
-To access the Admin Panel during the demo:
-
-- **Login URL**: `http://localhost:3000/admin`
-- **Username**: `admin`
-- **Password**: `admin123`
 
 ## 🛠️ Quick Start
 
