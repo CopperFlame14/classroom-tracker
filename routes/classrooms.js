@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { initDB, prepare } = require('../database/db');
 const { getRoomStatus, getAllRoomsWithStatus, getCurrentTimeSlot, getTodayName, getTodayDate } = require('../services/statusEngine');
+const { requireAuth } = require('./auth');
 
 // GET /api/classrooms - List all classrooms with current status
 router.get('/', async (req, res) => {
@@ -97,8 +98,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// PUT /api/classrooms/:id/status - Override room status (admin)
-router.put('/:id/status', async (req, res) => {
+// PUT /api/classrooms/:id/status - Override room status (admin, requires auth)
+router.put('/:id/status', requireAuth, async (req, res) => {
     try {
         await initDB();
         const { status, expiresIn } = req.body; // expiresIn in minutes
@@ -130,8 +131,8 @@ router.put('/:id/status', async (req, res) => {
     }
 });
 
-// DELETE /api/classrooms/:id/status - Clear status override
-router.delete('/:id/status', async (req, res) => {
+// DELETE /api/classrooms/:id/status - Clear status override (requires auth)
+router.delete('/:id/status', requireAuth, async (req, res) => {
     try {
         await initDB();
         prepare(`

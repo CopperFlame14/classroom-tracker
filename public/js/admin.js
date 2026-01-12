@@ -5,7 +5,14 @@
 const API_BASE = '/api';
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Check authentication first
+    const isAuthenticated = await checkAuth();
+    if (!isAuthenticated) {
+        window.location.href = '/login';
+        return;
+    }
+
     updateClock();
     setInterval(updateClock, 1000);
     loadRoomsDropdown();
@@ -13,7 +20,70 @@ document.addEventListener('DOMContentLoaded', () => {
     loadReservations();
     setDefaultDate();
     setupForm();
+    updateUserIndicator();
 });
+
+// ===========================
+// AUTHENTICATION
+// ===========================
+
+function getAuthToken() {
+    return localStorage.getItem('authToken');
+}
+
+function getAuthHeaders() {
+    const token = getAuthToken();
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+}
+
+async function checkAuth() {
+    const token = getAuthToken();
+    if (!token) {
+        return false;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE}/auth/verify`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.ok;
+    } catch (error) {
+        console.error('Auth check failed:', error);
+        return false;
+    }
+}
+
+function updateUserIndicator() {
+    const username = localStorage.getItem('authUser') || 'Admin';
+    const indicator = document.getElementById('userIndicator');
+    if (indicator) {
+        indicator.textContent = `👤 ${username}`;
+    }
+}
+
+async function logout() {
+    const token = getAuthToken();
+
+    try {
+        await fetch(`${API_BASE}/auth/logout`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('authUser');
+    window.location.href = '/login';
+}
 
 // ===========================
 // CLOCK
@@ -157,13 +227,18 @@ function setupForm() {
         try {
             const response = await fetch(`${API_BASE}/reservations`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: getAuthHeaders(),
                 body: JSON.stringify(data)
             });
 
             const result = await response.json();
 
             if (!response.ok) {
+                if (response.status === 401) {
+                    showToast('Session expired. Please login again.', 'error');
+                    setTimeout(() => window.location.href = '/login', 1500);
+                    return;
+                }
                 if (response.status === 409) {
                     showConflictAlert(result.details);
                 } else {
@@ -209,9 +284,15 @@ async function applyOverride() {
     try {
         const response = await fetch(`${API_BASE}/classrooms/${roomId}/status`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify({ status, expiresIn: duration })
         });
+
+        if (response.status === 401) {
+            showToast('Session expired. Please login again.', 'error');
+            setTimeout(() => window.location.href = '/login', 1500);
+            return;
+        }
 
         if (!response.ok) {
             throw new Error('Failed to apply override');
@@ -234,8 +315,17 @@ async function clearOverride() {
 
     try {
         const response = await fetch(`${API_BASE}/classrooms/${roomId}/status`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
         });
+
+        if (response.status === 401) {
+            showToast('Session expired. Please login again.', 'error');
+            setTimeout(() => window.location.href = '/login', 1500);
+            return;
+        }
 
         if (!response.ok) {
             throw new Error('Failed to clear override');
@@ -259,8 +349,17 @@ async function cancelReservation(id) {
 
     try {
         const response = await fetch(`${API_BASE}/reservations/${id}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
         });
+
+        if (response.status === 401) {
+            showToast('Session expired. Please login again.', 'error');
+            setTimeout(() => window.location.href = '/login', 1500);
+            return;
+        }
 
         if (!response.ok) {
             throw new Error('Failed to cancel reservation');

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { initDB, prepare } = require('../database/db');
 const { checkConflict, getTodayDate } = require('../services/statusEngine');
+const { requireAuth } = require('./auth');
 
 // GET /api/reservations - List all reservations
 router.get('/', async (req, res) => {
@@ -46,8 +47,8 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST /api/reservations - Create new reservation with conflict check
-router.post('/', async (req, res) => {
+// POST /api/reservations - Create new reservation with conflict check (requires auth)
+router.post('/', requireAuth, async (req, res) => {
     try {
         await initDB();
         const { room_id, slot_id, date, purpose, booked_by } = req.body;
@@ -87,8 +88,8 @@ router.post('/', async (req, res) => {
     }
 });
 
-// DELETE /api/reservations/:id - Cancel reservation
-router.delete('/:id', async (req, res) => {
+// DELETE /api/reservations/:id - Cancel reservation (requires auth)
+router.delete('/:id', requireAuth, async (req, res) => {
     try {
         await initDB();
         const result = prepare('DELETE FROM reservations WHERE id = ?').run(parseInt(req.params.id));
