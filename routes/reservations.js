@@ -67,11 +67,14 @@ router.post('/', async (req, res) => {
             });
         }
 
-        // Create reservation
+        // Create reservation - ensure slot_id is stored as integer
+        const slotIdInt = parseInt(slot_id);
         const result = prepare(`
             INSERT INTO reservations (room_id, slot_id, date, purpose, booked_by)
             VALUES (?, ?, ?, ?, ?)
-        `).run(room_id, slot_id, date, purpose || '', booked_by || 'Anonymous');
+        `).run(room_id, slotIdInt, date, purpose || '', booked_by || 'Anonymous');
+
+        console.log(`✅ Reservation created: Room ${room_id}, Slot ${slotIdInt}, Date ${date}`);
 
         res.status(201).json({
             success: true,

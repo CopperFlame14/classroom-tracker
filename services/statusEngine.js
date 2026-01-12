@@ -49,7 +49,7 @@ function getTodayDate() {
  * Priority: Override > Reservation > Timetable > Available
  */
 function getRoomStatus(roomId, slotId = null, day = null, date = null) {
-    const currentSlot = slotId || (getCurrentTimeSlot()?.id);
+    const currentSlot = slotId !== null ? parseInt(slotId) : (getCurrentTimeSlot()?.id || null);
     const currentDay = day || getTodayName();
     const currentDate = date || getTodayDate();
 
@@ -74,25 +74,25 @@ function getRoomStatus(roomId, slotId = null, day = null, date = null) {
         }
     }
 
-    // Check for reservation
+    // Check for reservation - ensure slot_id is integer for comparison
     const reservations = prepare(`
         SELECT * FROM reservations 
-        WHERE room_id = ? AND slot_id = ? AND date = ?
+        WHERE room_id = ? AND CAST(slot_id AS INTEGER) = ? AND date = ?
     `).all(roomId, currentSlot, currentDate);
 
     if (reservations.length > 0) {
         const reservation = reservations[0];
         return {
             status: 'reserved',
-            reason: reservation.purpose,
+            reason: reservation.purpose || 'Reserved',
             bookedBy: reservation.booked_by
         };
     }
 
-    // Check timetable
+    // Check timetable - ensure slot_id is integer for comparison
     const timetableEntries = prepare(`
         SELECT * FROM timetable 
-        WHERE room_id = ? AND slot_id = ? AND day = ?
+        WHERE room_id = ? AND CAST(slot_id AS INTEGER) = ? AND day = ?
     `).all(roomId, currentSlot, currentDay);
 
     if (timetableEntries.length > 0) {
