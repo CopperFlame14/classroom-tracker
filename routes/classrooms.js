@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const { initDB, prepare } = require('../database/db');
-const { getRoomStatus, getAllRoomsWithStatus, getCurrentTimeSlot, getTodayName, getTodayDate } = require('../services/statusEngine');
+const { getRoomStatus, getAllRoomsWithStatus, getCurrentTimeSlot, getTodayName, getTodayDate, getAvailableSlotsForRoom } = require('../services/statusEngine');
 const { requireAuth } = require('./auth');
 
-// GET /api/classrooms - List all classrooms with current status
+// GET /api/classrooms - List all classrooms with status (filterable)
 router.get('/', async (req, res) => {
     try {
         await initDB();
-        const { block, floor, capacity, status, search } = req.query;
-        let rooms = getAllRoomsWithStatus();
+        const { block, floor, capacity, status, search, slot_id, date } = req.query;
+
+        // Pass filtering params to getAllRoomsWithStatus
+        let rooms = getAllRoomsWithStatus(slot_id, date);
 
         // Apply filters
         if (block) {
@@ -30,7 +32,6 @@ router.get('/', async (req, res) => {
             rooms = rooms.filter(r => r.id.toLowerCase().includes(searchLower));
         }
 
-        // Calculate stats
         const stats = {
             total: rooms.length,
             available: rooms.filter(r => r.currentStatus === 'available').length,
@@ -38,12 +39,7 @@ router.get('/', async (req, res) => {
             reserved: rooms.filter(r => r.currentStatus === 'reserved').length
         };
 
-        res.json({
-            rooms,
-            stats,
-            currentSlot: getCurrentTimeSlot(),
-            currentDay: getTodayName()
-        });
+        res.json({ rooms, stats });
     } catch (error) {
         console.error('Error in GET /classrooms:', error);
         res.status(500).json({ error: error.message });
@@ -94,6 +90,21 @@ router.get('/:id', async (req, res) => {
         });
     } catch (error) {
         console.error('Error in GET /classrooms/:id:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// GET /api/classrooms/:id/slots - Get available slots for a room
+router.get('/:id/slots', async (req, res) => {
+    try {
+        await initDB();
+        const { date } = req.query;
+        if (!date) return res.status(400).json({ error: 'Date is required' });
+
+        const slots = getAvailableSlotsForRoom(req.params.id, date);
+        res.json(slots);
+    } catch (error) {
+        console.error('Error in GET /classrooms/:id/slots:', error);
         res.status(500).json({ error: error.message });
     }
 });

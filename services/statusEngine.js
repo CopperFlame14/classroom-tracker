@@ -124,20 +124,55 @@ function getRoomStatus(roomId, slotId = null, day = null, date = null) {
 /**
  * Get all rooms with their current status
  */
-function getAllRoomsWithStatus() {
+function getAllRoomsWithStatus(slotId = null, date = null) {
     const rooms = prepare('SELECT * FROM classrooms ORDER BY block, floor, id').all();
-    const currentSlot = getCurrentTimeSlot();
-    const today = getTodayName();
-    const todayDate = getTodayDate();
+
+    let targetSlotId = null;
+    let targetDay = null;
+    let targetDate = null;
+
+    if (slotId || date) {
+        targetDate = date || getTodayDate();
+        targetSlotId = slotId ? parseInt(slotId) : null;
+
+        // Calculate day from date
+        const d = new Date(targetDate);
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        targetDay = dayNames[d.getDay()];
+    } else {
+        const currentSlot = getCurrentTimeSlot();
+        targetSlotId = currentSlot?.id || null;
+        targetDay = getTodayName();
+        targetDate = getTodayDate();
+    }
 
     return rooms.map(room => {
-        const statusInfo = getRoomStatus(room.id, currentSlot?.id, today, todayDate);
+        const statusInfo = getRoomStatus(room.id, targetSlotId, targetDay, targetDate);
         return {
             ...room,
             amenities: room.amenities ? JSON.parse(room.amenities) : [],
             currentStatus: statusInfo.status,
             statusReason: statusInfo.reason,
             statusDetails: statusInfo
+        };
+    });
+}
+
+/**
+ * Get available slots for a specific room and date
+ */
+function getAvailableSlotsForRoom(roomId, date) {
+    const slots = prepare('SELECT * FROM time_slots ORDER BY id').all();
+    const d = new Date(date);
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const day = dayNames[d.getDay()];
+
+    return slots.map(slot => {
+        const status = getRoomStatus(roomId, slot.id, day, date);
+        return {
+            ...slot,
+            isAvailable: status.status === 'available',
+            statusDetails: status
         };
     });
 }
@@ -206,5 +241,6 @@ module.exports = {
     getRoomStatus,
     getAllRoomsWithStatus,
     checkConflict,
-    clearExpiredOverrides
+    clearExpiredOverrides,
+    getAvailableSlotsForRoom
 };

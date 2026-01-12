@@ -15,12 +15,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     updateClock();
     setInterval(updateClock, 1000);
+
+    // Initial load
     loadRoomsDropdown();
     loadTimeSlots();
     loadReservations();
     setDefaultDate();
     setupForm();
     updateUserIndicator();
+
+    // Add dynamic filters
+    document.getElementById('resRoom').addEventListener('change', handleRoomChange);
+    document.getElementById('resSlot').addEventListener('change', handleSlotChange);
+    document.getElementById('resDate').addEventListener('change', handleDateChange);
 });
 
 // ===========================
@@ -112,37 +119,117 @@ function updateClock() {
 }
 
 // ===========================
-// LOAD DATA
+// LOAD DATA & FILTERS
 // ===========================
 
-async function loadRoomsDropdown() {
+async function loadRoomsDropdown(rooms = null) {
     try {
-        const response = await fetch(`${API_BASE}/classrooms`);
-        const data = await response.json();
+        let roomList = rooms;
+        if (!roomList) {
+            const response = await fetch(`${API_BASE}/classrooms`);
+            const data = await response.json();
+            roomList = data.rooms;
+        }
 
-        const options = data.rooms.map(room =>
+        const select = document.getElementById('resRoom');
+        const currentVal = select.value;
+        const options = roomList.map(room =>
             `<option value="${room.id}">${room.id} (Block ${room.block}, ${room.capacity} seats)</option>`
         ).join('');
 
-        document.getElementById('resRoom').innerHTML = `<option value="">Select a room...</option>${options}`;
-        document.getElementById('overrideRoom').innerHTML = `<option value="">Select a room...</option>${options}`;
+        select.innerHTML = `<option value="">Select a room...</option>${options}`;
+
+        // Restore selection if still valid
+        if (roomList.find(r => r.id === currentVal)) {
+            select.value = currentVal;
+        }
     } catch (error) {
         console.error('Failed to load rooms:', error);
     }
 }
 
-async function loadTimeSlots() {
+async function loadTimeSlots(slots = null) {
     try {
-        const response = await fetch(`${API_BASE}/timeslots`);
-        const slots = await response.json();
+        let slotList = slots;
+        if (!slotList) {
+            const response = await fetch(`${API_BASE}/timeslots`);
+            slotList = await response.json();
+        }
 
-        const options = slots.map(slot =>
-            `<option value="${slot.id}">${slot.label} (${slot.start_time} - ${slot.end_time})</option>`
-        ).join('');
+        const select = document.getElementById('resSlot');
+        const currentVal = select.value;
+        const options = slotList.map(slot => {
+            // Apply visual indication if availability is known (from dynamic filter)
+            let suffix = '';
+            let disabled = '';
 
-        document.getElementById('resSlot').innerHTML = `<option value="">Select a slot...</option>${options}`;
+            if (slot.isAvailable === false) {
+                suffix = ' (Unavailable)';
+                disabled = 'disabled style="color: #64748b"';
+            } else if (slot.isAvailable === true) {
+                suffix = ' (Available)';
+            }
+
+            return `<option value="${slot.id}" ${disabled}>${slot.label} (${slot.start_time} - ${slot.end_time})${suffix}</option>`;
+        }).join('');
+
+        select.innerHTML = `<option value="">Select a slot...</option>${options}`;
+
+        // Restore selection if valid
+        if (slotList.find(s => s.id == currentVal && s.isAvailable !== false)) {
+            select.value = currentVal;
+        }
     } catch (error) {
         console.error('Failed to load time slots:', error);
+    }
+}
+
+async function handleRoomChange() {
+    const roomId = document.getElementById('resRoom').value;
+    const date = document.getElementById('resDate').value;
+
+    if (roomId && date) {
+        // Fetch available slots for this room
+        try {
+            const response = await fetch(`${API_BASE}/classrooms/${roomId}/slots?date=${date}`);
+            const slots = await response.json();
+            loadTimeSlots(slots);
+        } catch (error) {
+            console.error('Error filtering slots:', error);
+        }
+    } else if (!roomId) {
+        // Reset slots if room cleared
+        loadTimeSlots();
+    }
+}
+
+async function handleSlotChange() {
+    const slotId = document.getElementById('resSlot').value;
+    const date = document.getElementById('resDate').value;
+
+    // Only filter rooms if a slot is selected. 
+    // If we filter rooms based on slot, we should ideally exclude occupied ones.
+    if (slotId && date) {
+        try {
+            // Fetch only available rooms for this slot
+            const response = await fetch(`${API_BASE}/classrooms?slot_id=${slotId}&date=${date}&status=available`);
+            const data = await response.json();
+            loadRoomsDropdown(data.rooms);
+        } catch (error) {
+            console.error('Error filtering rooms:', error);
+        }
+    } else if (!slotId) {
+        // Reset rooms if slot cleared
+        loadRoomsDropdown();
+    }
+}
+
+function handleDateChange() {
+    // Trigger update based on what is currently selected
+    if (document.getElementById('resRoom').value) {
+        handleRoomChange();
+    } else if (document.getElementById('resSlot').value) {
+        handleSlotChange();
     }
 }
 
@@ -251,6 +338,10 @@ function setupForm() {
             document.getElementById('reservationForm').reset();
             setDefaultDate();
             loadReservations();
+
+            // Reset dropdowns
+            loadRoomsDropdown();
+            loadTimeSlots();
         } catch (error) {
             console.error('Failed to create reservation:', error);
             showToast('Failed to create reservation', 'error');
@@ -270,6 +361,9 @@ function hideConflictAlert() {
 // ===========================
 // STATUS OVERRIDE
 // ===========================
+// (Copied existing logic for override if needed, using overrides from previous file)
+// Note: The previous file had applyOverride and clearOverride. I will verify if I need to include them.
+// Looking at the view_file of admin.js lines 274-339, yes.
 
 async function applyOverride() {
     const roomId = document.getElementById('overrideRoom').value;
@@ -338,10 +432,6 @@ async function clearOverride() {
     }
 }
 
-// ===========================
-// CANCEL RESERVATION
-// ===========================
-
 async function cancelReservation(id) {
     if (!confirm('Are you sure you want to cancel this reservation?')) {
         return;
@@ -372,10 +462,6 @@ async function cancelReservation(id) {
         showToast('Failed to cancel reservation', 'error');
     }
 }
-
-// ===========================
-// TOAST
-// ===========================
 
 function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
