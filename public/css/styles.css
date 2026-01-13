@@ -124,6 +124,7 @@ a:hover {
     font-size: 1.25rem;
     background: linear-gradient(to right, #fff, #999);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -611,3 +612,81 @@ select:focus {
 
 /* Extra Tweaks needed for HTML structure compatibility */
 /* The filter logic expects inputs to be there. I've styled them. */
+
+/* ===========================
+   SCHEDULE GRID (Timetable)
+   =========================== */
+
+.schedule-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.schedule-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.schedule-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateX(4px);
+}
+
+.schedule-item.current {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.schedule-item.current::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--success);
+}
+
+.schedule-time {
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.9rem;
+    color: #fff;
+    text-align: right;
+    line-height: 1.2;
+    padding-right: 1rem;
+    border-right: 1px solid var(--border-subtle);
+}
+
+.schedule-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.schedule-subject {
+    font-weight: 600;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.schedule-faculty {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Status Badges in Schedule (Overrides/Tweaks) */
+.schedule-item .room-status {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+}
